@@ -31,6 +31,24 @@ class EditPhoneBook:
 
     def process_doubles(self):
         # short execution time
+        double_name_dict = {}
+        for row in self.contacts_list:
+            if not double_name_dict.get(row[0] + row[1]):
+                double_name_dict[row[0] + row[1]] = [row]
+            else:
+                double_name_dict[row[0] + row[1]].append(row)
+
+        self.contacts_list.clear()
+
+        for key, value in double_name_dict.items():
+            while len(value) != 1:
+                value.append([x or y for x, y in zip(value.pop(0), value.pop(0))])
+            self.contacts_list.append(*value)
+
+        self.contacts_list.sort()
+
+    def process_doubles_v2(self):
+        # short code
         fixed_info_list = []
         for i in range(len(self.contacts_list)):
             for j in range(len(self.contacts_list)):
@@ -40,29 +58,6 @@ class EditPhoneBook:
                 fixed_info_list.append(self.contacts_list[i])
         fixed_info_list.sort()
         self.contacts_list = fixed_info_list
-
-    def process_doubles_v2(self):
-        # short code
-        double_name_dict = {}
-        for row in self.contacts_list:
-            if not double_name_dict.get(row[0] + row[1]):
-                double_name_dict[row[0] + row[1]] = [row]
-            else:
-                double_name_dict[row[0] + row[1]].append(row)
-
-        self.contacts_list.clear()
-        result = self.contacts_list
-        count_dict = 0
-
-        for key, values in double_name_dict.items():
-            result.append(values.pop(0))
-            if len(values) > 0:
-                for row in values:
-                    for index, column in enumerate(row):
-                        if not result[count_dict][index]:
-                            result[count_dict][index] = column
-            count_dict += 1
-        result.sort()
 
     def reformat_phone_numbers(self):
         regex_pattern = r"(\+7|8)\s?\(?(\d{3})\)?\s?\-?(\d+)s?\-?(\d+)s?\-?(\d+)\s?\(?(доб.)?\s?(\d+)?\)?"
